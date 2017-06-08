@@ -13,7 +13,7 @@
           <div class="slogan"><p class="text-center">Replace The Negatives In Your Life With Positives And Move Your Life Ahead</p></div>
           <br>
           <div class="row column text-center">
-            <button class="hollow button">PLAY NOW</button>
+            <button class="hollow button" @click="play">PLAY NOW</button>
           </div>
           
         </div>
@@ -61,6 +61,7 @@
               <p>Replace The Negatives In Your Life With Positives And Move Your Life Ahead</p>
             </div>
         </div>
+        <mps-game v-if="playing"></mps-game>
   </div>
 </template>
 
@@ -119,18 +120,28 @@
 </style>
 
 <script>
+import MpsGame from './MpsGame';
 
 export default {
   name: 'hello',
   data() {
     return {
       msg: 'Vue + Foundation',
+      playing: false,
     };
   },
   mounted() {
     // const height = $(window).innerHeight();
     // document.getElementById('first_window').style.height = height;
     // console.log(height);
+  },
+  methods: {
+    play() {
+      this.playing = true;
+    },
+  },
+  components: {
+    MpsGame,
   },
 };
 </script>
