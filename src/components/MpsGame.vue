@@ -1,84 +1,154 @@
 <template>
-	<div id="game">
-		<div class="modal-overlay">
-			<div class="modal">
-				<h2 class="winner">Well Done!</h2>
-				<button @click="restart" class="restart">Play Again?</button>
-				<p class="share-text">Share it?</p>
-				<ul class="social">
-					<li></li>
-				</ul>
-			</div>
-		</div>
-	</div>
+  <div id="game">
+    <div class="" style="height: 500px;">
+      <div class="modal">
+        <h2 class="winner">Well Done!</h2>
+        <button @click="restart" class="restart">Play Again?</button>
+        <p class="share-text">Share it?</p>
+        <ul class="social">
+          <li></li>
+        </ul>
+      </div>
+      <div v-for="(card, index) in shuffledCards" :id="index" class="card" :data-id="card.id" @click="flip(index)">
+        <div class="inside">
+          <div class="front">
+            <img :src="card.img" :alt="card.name" />
+          </div>
+          <div class="back">
+            <img src="http://i.imgur.com/diex0Zl.png" alt="Codepen" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 <script>
-	export default {
-	  name: 'game',
-	  mounted() {
-
-	  },
-	  created() {
-
-	  },
-	  data() {
-	    return {
-	      msg: 'Game',
-	      game: '',
-	      modal: '',
-	      overlay: '',
-	      // restartButton:'',
-	      cardsArray: '',
-	      shuffleCards: '',
-	      card: [
-	      	{
-	      		name: 'mpsOne' ,
-	      		img: 'https://cdn.dribbble.com/users/139604/screenshots/3505913/a-behind-the-scenes-project-walkthrough_1x.jpg',
-	      		id: 1,
-	      	},
-	      	{
-	      		name: 'mpsTwo' ,
-	      		img: 'https://cdn.dribbble.com/users/139604/screenshots/3505913/a-behind-the-scenes-project-walkthrough_1x.jpg',
-	      		id: 2,
-	      	},
-	      	{
-	      		name: 'mpsThree',
-	      		img: 'https://cdn.dribbble.com/users/139604/screenshots/3505913/a-behind-the-scenes-project-walkthrough_1x.jpg',
-	      		id: 3,
-	      	},
-	      	{
-	      		name: 'mpsFour',
-	      		img: 'https://cdn.dribbble.com/users/139604/screenshots/3505913/a-behind-the-scenes-project-walkthrough_1x.jpg',
-	      		id: 4,
-	      	},
-	      ],
-	    };
-	  },
-	  destroyed() {
-	    this.accordion.destroy();
-	  },
-	};
+export default {
+  /* eslint-disable */
+  name: 'game',
+  mounted() {
+    this.shuffleCards();
+  },
+  created() {
+  },
+  data() {
+    return {
+      msg: 'Game',
+      game: '',
+      modal: '',
+      overlay: '',
+      // restartButton:'',
+      cardsArray: '',
+      shuffledCards: [],
+      paused: false,
+      guess: null,
+      cards: [
+        {
+          name: 'mpsOne',
+          img: 'http://lorempixel.com/400/200/sports',
+          id: 1,
+        },
+        {
+          name: 'mpsTwo',
+          img: 'http://lorempixel.com/400/200/city',
+          id: 2,
+        },
+        {
+          name: 'mpsThree',
+          img: 'http://lorempixel.com/400/200/people',
+          id: 3,
+        },
+        {
+          name: 'mpsFour',
+          img: 'http://lorempixel.com/400/200/transport',
+          id: 4,
+        },
+      ],
+    };
+  },
+  methods: {
+    restart() {
+      this.shuffleCards();
+    },
+    shuffleCards() {
+      this.shuffledCards = this.shuffle(this.cards.concat(this.cards));
+    },
+    shuffle(array) {
+      let counter = array.length;
+      let temp;
+      let index;
+      const localArray = array;
+      // While there are elements in the array
+      while (counter > 0) {
+        // Pick a random index
+        index = Math.floor(Math.random() * counter);
+        // Decrease counter by 1
+        counter -= 1;
+        // And swap the last element with it
+        temp = localArray[counter];
+        localArray[counter] = array[index];
+        localArray[index] = temp;
+      }
+      return localArray;
+    },
+    flip(cardId) {
+      const $card = $('#'+ cardId); // eslint-disable-line
+      if (!this.paused && !$card.find('.inside').hasClass('matched') && !$card.find('.inside').hasClass('picked')) {
+        $card.find('.inside').addClass('picked');
+        if (!this.guess) {
+          this.guess = $($card).attr('data-id');
+        } else if (this.guess === $($card).attr('data-id') && !$($card).hasClass('picked')) {
+          $('.picked').addClass('matched');
+          this.guess = null;
+        } else {
+          this.guess = null;
+          this.paused = true;
+          setTimeout(() => {
+            $('.picked').removeClass('picked');
+            this.paused = false;
+          }, 600);
+        }
+        if ($('.matched').length === $('.card').length) {
+          this.win();
+        }
+      }
+    },
+    win() {
+      this.paused = true;
+			setTimeout(function(){
+				alert('SSSSSS');
+			}, 1000);
+    },
+  },
+  destroyed() {
+    // this.accordion.destroy();
+  },
+};
 </script>
 <style lang='scss' scoped>
 @import url(http://weloveiconfonts.com/api/?family=brandico);
 
+
+
 /* brandico */
+
 [class*="brandico-"]:before {
   font-family: 'brandico', sans-serif;
 }
 
 * {
-	box-sizing: border-box;
+  box-sizing: border-box;
 }
 
-html, body {
-	height: 100%;
+html,
+body {
+  height: 100%;
 }
 
 body {
-	background: black;
-	min-height: 100%;
-	font-family: "Arial", sans-serif;
+  background: black;
+  min-height: 100%;
+  font-family: "Arial", sans-serif;
 }
 
 .wrap {
@@ -89,214 +159,216 @@ body {
 }
 
 .game {
-	transform-style: preserve-3d;
-	perspective: 500px;
-	min-height: 100%;
+  transform-style: preserve-3d;
+  perspective: 500px;
+  min-height: 100%;
   height: 100%;
 }
 
-@mixin width($max){
-	@media (max-width: $max){
-		@content;
-	}
+@mixin width($max) {
+  @media (max-width: $max) {
+    @content;
+  }
 }
 
 @keyframes matchAnim {
-	0% {
-		background: #bcffcc;
-	}
-	100% {
-		background: white;
-	}
+  0% {
+    background: #bcffcc;
+  }
+  100% {
+    background: white;
+  }
 }
 
 .card {
   float: left;
-  width: 16.66666%;
+  width: 25%;
   height: 25%;
   padding: 5px;
   text-align: center;
-	display: block;
-	perspective: 500px;
-	position: relative;
-	cursor: pointer;
-  z-index: 50; 
-	-webkit-tap-highlight-color: rgba(0,0,0,0);  
-	@include width(800px){
-		width: 25%;
-		height: 16.666%;
-	}
-  
-	.inside {
-		width: 100%;
-		height: 100%;
-		display: block;
-		transform-style: preserve-3d;
-		transition: .4s ease-in-out;
-		background: white;
+  display: block;
+  perspective: 500px;
+  position: relative;
+  cursor: pointer;
+  z-index: 50;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  @include width(800px) {
+    width: 25%;
+    height: 16.666%;
+  }
 
-		&.picked, &.matched {
-			transform: rotateY(180deg);
-		}
-		&.matched {
-			animation: 1s matchAnim ease-in-out;
-			animation-delay: .4s;
-		}
-	}
-  
-  .front, .back {
-  	border: 1px solid black;
-  	backface-visibility: hidden;
-  	position: absolute;
-  	top: 0;
-  	left: 0;
-  	width: 100%;
-  	height: 100%;
-  	padding: 20px;
+  .inside {
+    width: 100%;
+    height: 100%;
+    display: block;
+    transform-style: preserve-3d;
+    transition: .4s ease-in-out;
+    background: white;
 
-  	img {
-  		max-width: 100%;
-  		display: block;
-  		margin: 0 auto;
-  		max-height: 100%;
-  	}
+    &.picked,
+    &.matched {
+      transform: rotateY(180deg);
+    }
+    &.matched {
+      animation: 1s matchAnim ease-in-out;
+      animation-delay: .4s;
+    }
+  }
+
+  .front,
+  .back {
+    border: 1px solid black;
+    backface-visibility: hidden;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+
+    img {
+      max-width: 100%;
+      display: block;
+      margin: 0 auto;
+      max-height: 100%;
+    }
   }
   .front {
-  	transform: rotateY(-180deg);
-  	@include width(800px){
-  		padding: 5px;
-  	}
+    transform: rotateY(-180deg);
+    @include width(800px) {
+      padding: 5px;
+    }
   }
-  .back{
-		@include width(800px){
-  		padding: 10px;
-  	}
+  .back {
+    @include width(800px) {
+      padding: 10px;
+    }
   }
 }
 
 .modal-overlay {
-	display: none;
-	background: rgba(0,0,0,.8);
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
+  display: none;
+  background: rgba(0, 0, 0, .8);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
 }
 
 .modal {
-	display: none;
-	position: relative;
-	width: 500px;
-	height: 400px;
-	max-height: 90%;
-	max-width: 90%;
-	min-height: 380px;
-	margin: 0 auto;
-	background: white;
-	top: 50%;
-	transform: translateY(-50%);
-	padding: 30px 10px;
-	.winner {
-		font-size: 80px;
-		text-align: center;
-		font-family: "Anton", sans-serif;
-		color: #4d4d4d;
-		text-shadow: 0px 3px 0 black;
-		@include width(480px){
-			font-size: 60px;
-		}
-	}
-	.restart {
-		font-family: "Anton", sans-serif;
-		margin: 30px auto;
-		padding: 20px 30px;
-		display: block;
-		font-size: 30px;
-		border: none;
-		background: #4d4d4d;
-		background: linear-gradient(#4d4d4d, #222);
-		border: 1px solid #222;
-		border-radius: 5px;
-		color: white;
-		text-shadow: 0px 1px 0 black;
-		cursor: pointer;
-		&:hover {
-			background: linear-gradient(#222, black);
-		}
-	}
-	.message {
-		text-align: center;
-		a {
-			text-decoration: none;
-			color: #28afe6;
-			font-weight: bold;
-			&:hover {
-				$c: lighten(#28afe6, 10%);
-				color: $c;
-				border-bottom: 1px dotted $c;
-			}
-		}
-	}
-	.share-text {
-		text-align: center;
-		margin: 10px auto;
-	}
-	.social {
-		margin: 20px auto;
-		text-align: center;
-		li {
-			display: inline-block;
-			height: 50px;
-			width: 50px;
-			margin-right: 10px;
-			&:last-child {
-				margin-right: 0;
-			}
-			a {
-				display: block;
-				line-height: 50px;
-				font-size: 20px;
-				color: white;
-				text-decoration: none;
-				border-radius: 5px;
-				&.facebook {
-					background: #3b5998;
-					&:hover {
-						background: lighten(#3b5998, 10%);
-					}
-				}
-				&.google {
-					background: #D34836;
-					&:hover {
-						background: lighten(#D34836, 10%);
-					}
-				}
-				&.twitter {
-					background: #4099FF;
-					&:hover {
-						background: lighten(#4099FF, 10%);
-					}
-				}
-			}
-		}
-	}
+  display: none;
+  position: relative;
+  width: 500px;
+  height: 400px;
+  max-height: 90%;
+  max-width: 90%;
+  min-height: 380px;
+  margin: 0 auto;
+  background: white;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 30px 10px;
+  .winner {
+    font-size: 80px;
+    text-align: center;
+    font-family: "Anton", sans-serif;
+    color: #4d4d4d;
+    text-shadow: 0px 3px 0 black;
+    @include width(480px) {
+      font-size: 60px;
+    }
+  }
+  .restart {
+    font-family: "Anton", sans-serif;
+    margin: 30px auto;
+    padding: 20px 30px;
+    display: block;
+    font-size: 30px;
+    border: none;
+    background: #4d4d4d;
+    background: linear-gradient(#4d4d4d, #222);
+    border: 1px solid #222;
+    border-radius: 5px;
+    color: white;
+    text-shadow: 0px 1px 0 black;
+    cursor: pointer;
+    &:hover {
+      background: linear-gradient(#222, black);
+    }
+  }
+  .message {
+    text-align: center;
+    a {
+      text-decoration: none;
+      color: #28afe6;
+      font-weight: bold;
+      &:hover {
+        $c: lighten(#28afe6, 10%);
+        color: $c;
+        border-bottom: 1px dotted $c;
+      }
+    }
+  }
+  .share-text {
+    text-align: center;
+    margin: 10px auto;
+  }
+  .social {
+    margin: 20px auto;
+    text-align: center;
+    li {
+      display: inline-block;
+      height: 50px;
+      width: 50px;
+      margin-right: 10px;
+      &:last-child {
+        margin-right: 0;
+      }
+      a {
+        display: block;
+        line-height: 50px;
+        font-size: 20px;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        &.facebook {
+          background: #3b5998;
+          &:hover {
+            background: lighten(#3b5998, 10%);
+          }
+        }
+        &.google {
+          background: #D34836;
+          &:hover {
+            background: lighten(#D34836, 10%);
+          }
+        }
+        &.twitter {
+          background: #4099FF;
+          &:hover {
+            background: lighten(#4099FF, 10%);
+          }
+        }
+      }
+    }
+  }
 }
 
 footer {
-	height: 20px;
-	position: absolute;
-	bottom: 0;
-	width: 100%;
+  height: 20px;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
   z-index: 0;
-	.disclaimer {
-		line-height: 20px;
-		font-size: 12px;
-		color: #727272;
-		text-align: center;
-		@include width(767px){
-			font-size: 8px;
-		}
-	}
+  .disclaimer {
+    line-height: 20px;
+    font-size: 12px;
+    color: #727272;
+    text-align: center;
+    @include width(767px) {
+      font-size: 8px;
+    }
+  }
 }
 </style>
